@@ -98,9 +98,9 @@
 ;; Select a CD using the artist name
 (defun select-by-artist (artist)
   (remove-if-not
-  #'(lambda (cd)
-      (equal (getf cd :artist) artist))
-  *db*))
+   #'(lambda (cd)
+       (equal (getf cd :artist) artist))
+   *db*))
 
 (select-by-artist "Dixie Chicks")
 
@@ -135,3 +135,27 @@
 
 (select (where :artist "Dixie Chicks"))
 (select (where :rating 8 :ripped nil))
+
+;; -------------------------
+;; Updating existing records
+;; -------------------------
+
+;; Update CD function
+(defun update (selector-fn &key title artist rating (ripped nil ripped-p))
+  (setf *db*
+        (mapcar
+         #'(lambda (row)
+             (when (funcall selector-fn row)
+               (if title (setf (getf row :title) title))
+               (if artist (setf (getf row :artist) artist))
+               (if rating (setf (getf row :rating) rating))
+               (if ripped-p (setf (getf row :ripped) ripped)))
+             row) *db*)))
+
+(update (where :artist "Dixie Chicks") :rating 11)
+
+;; Delete CD function
+(defun delete-rows (selector-fn)
+  (setf *db* (remove-if selector-fn *db*)))
+
+(delete-rows (where :rating 7))
