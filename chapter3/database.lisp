@@ -22,7 +22,7 @@
   (push cd *db*))
 
 (add-record (make-cd "Roses" "Kathy Mattea" 7 t))
-(add-record (make-cd "Fly" "Dixie Chicks" 8 t))
+(add-record (make-cd "Fly" "Dixie Chicks" 8 nil))
 (add-record (make-cd "Home" "Dixie Chicks" 9 t))
 
 ;; --------------------------------
@@ -115,3 +115,23 @@
 ;; Use select and artist-seletor to select CDs
 (select (artist-selector "Dixie Chicks"))
 (select (artist-selector "Kathy Mattea"))
+
+;; Define a general selector-function generator
+(defun where (&key title artist rating (ripped nil ripped-p))
+  #'(lambda (cd)
+      (and
+       (if title
+           (equal (getf cd :title) title)
+           t)
+       (if artist
+           (equal (getf cd :artist) artist)
+           t)
+       (if rating
+           (equal (getf cd :rating) rating)
+           t)
+       (if ripped-p
+           (equal (getf cd :ripped) ripped)
+           t))))
+
+(select (where :artist "Dixie Chicks"))
+(select (where :rating 8 :ripped nil))
