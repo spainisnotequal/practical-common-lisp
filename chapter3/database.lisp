@@ -159,3 +159,27 @@
   (setf *db* (remove-if selector-fn *db*)))
 
 (delete-rows (where :rating 7))
+
+;; ------------------------------------
+;; Removing duplication and winning big
+;; ------------------------------------
+
+(defun make-comparison-expr (field value)    ; wrong
+  (list equal (list getf cd field) value))
+
+(defun make-comparison-expr (field value)
+  (list 'equal (list 'getf 'cd field) value))
+
+(defun make-comparison-expr (field value)    ; simpler version
+  `(equal (getf cd ,field) ,value))
+
+(defun make-comparison-list (fields)
+  (loop while fields
+       collecting (make-comparison-expr (pop fields) (pop fields))))
+
+(defmacro where (&rest clauses)
+  `#'(lambda (cd) (and ,@(make-comparison-list clauses))))
+
+(macroexpand-1 '(where :rating 10 :title "Give us a break"))
+
+(select (where :rating 11 :title "Home"))
