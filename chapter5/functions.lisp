@@ -68,3 +68,30 @@
 (create-list :a 1 :c 1)       ; => (1 0 1 NIL)
 (create-list :c 1 :b 0)       ; => (0 0 1 T)
 (create-list :c 1 :a -6 :b 0) ; => (-6 0 1 T)
+
+
+;;; ----------------------------------------
+;;; Function as Data. Higher-Order Functions
+;;; ----------------------------------------
+
+(defun by-2 (x)
+  (* 2 x))
+
+;; #' is syntactic sugar for the function named "function",
+;; which returns the function object
+(function by-2) ; => #<FUNCTION BY-2>
+#'by-2          ; => #<FUNCTION BY-2>
+
+;; Using functions as arguments of other functions
+(defun plot (fn min max step)
+  (loop for i from min to max by step do
+       (loop repeat (funcall fn i) do (format t "*"))
+       (format t "~%")))
+
+(plot #'exp 0 4 1/2)
+
+(defvar plot-data (list #'exp 0 4 1/2)) ; function, min, max, step
+(apply #'plot plot-data)
+(defvar plot-data2 (list 0 4 1/2)) ; only min, max, step
+                                   ; (but not the function to plot) 
+(apply #'plot #'exp plot-data2)
