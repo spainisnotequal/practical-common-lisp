@@ -95,3 +95,11 @@
 
 (generate-sequence #'square 1 10 1)
 (generate-sequence #'cube 1 10 1)
+
+
+;;; -------------------
+;;; Anonymous functions
+;;; -------------------
+
+(generate-sequence #'(lambda (x) (* x x)) 1 10 1)
+(generate-sequence #'(lambda (x) (* x x x)) 1 10 1)
