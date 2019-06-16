@@ -83,15 +83,15 @@
 #'by-2          ; => #<FUNCTION BY-2>
 
 ;; Using functions as arguments of other functions
-(defun plot (fn min max step)
+(defun square (x)
+  (* x x))
+
+(defun cube (x)
+  (* x x x))
+
+(defun generate-sequence (fn min max step)
   (loop for i from min to max by step do
-       (loop repeat (funcall fn i) do (format t "*"))
-       (format t "~%")))
+       (format t "~d~%" (funcall fn i))))
 
-(plot #'exp 0 4 1/2)
-
-(defvar plot-data (list #'exp 0 4 1/2)) ; function, min, max, step
-(apply #'plot plot-data)
-(defvar plot-data2 (list 0 4 1/2)) ; only min, max, step
-                                   ; (but not the function to plot) 
-(apply #'plot #'exp plot-data2)
+(generate-sequence #'square 1 10 1)
+(generate-sequence #'cube 1 10 1)
