@@ -80,6 +80,12 @@
 (foo 1)        ; => (1 NIL NIL)
 (foo 1 :z 3)   ; => ERROR: odd number of &KEY arguments
 
+(defun bar (x &optional y1 y2 &key z)
+  (list x y1 y2 z))
+
+(bar 1 :z 3)   ; => (1 :z 3 NIL)
+
+
 ;;; ----------------------------------------
 ;;; Function as Data. Higher-Order Functions
 ;;; ----------------------------------------
