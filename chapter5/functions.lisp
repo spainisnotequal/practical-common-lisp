@@ -10,10 +10,10 @@
   (list a b c))
 
 (create-list 1 2 3)   ; => (1 2 3)
-(create-list 1 2)     ; => invalid number of arguments: 2
-(create-list 1)       ; => invalid number of arguments: 1
-(create-list)         ; => invalid number of arguments: 0
-(create-list 1 2 3 4) ; => invalid number of arguments: 4
+(create-list 1 2)     ; => ERROR: invalid number of arguments: 2
+(create-list 1)       ; => ERROR: invalid number of arguments: 1
+(create-list)         ; => ERROR: invalid number of arguments: 0
+(create-list 1 2 3 4) ; => ERROR: invalid number of arguments: 4
 
 ;; -------------------
 ;; Optional parameters
@@ -24,8 +24,8 @@
 
 (create-list 1 2 3 ); => (1 2 3 T)
 (create-list 1 2)   ; => (1 2 0 NIL)
-(create-list 1)     ; => invalid number of arguments: 1
-(create-list)       ; => invalid number of arguments: 0
+(create-list 1)     ; => ERROR: invalid number of arguments: 1
+(create-list)       ; => ERROR: invalid number of arguments: 0
 
 (defun create-list (a b &optional (c (/ a b)))
   (list a b c))
@@ -69,6 +69,16 @@
 (create-list :c 1 :b 0)       ; => (0 0 1 T)
 (create-list :c 1 :a -6 :b 0) ; => (-6 0 1 T)
 
+;; --------------------------------
+;; Mixing different parameter types
+;; --------------------------------
+
+(defun foo (x &optional y &key z)
+  (list x y z))
+
+(foo 1 2 :z 3) ; => (1 2 3)
+(foo 1)        ; => (1 NIL NIL)
+(foo 1 :z 3)   ; => ERROR: odd number of &KEY arguments
 
 ;;; ----------------------------------------
 ;;; Function as Data. Higher-Order Functions
