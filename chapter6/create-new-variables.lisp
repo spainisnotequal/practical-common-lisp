@@ -1,6 +1,6 @@
-;;;; -------------------- ;;;;
-;;;; Create New Variables ;;;;
-;;;; -------------------- ;;;;
+;;;; ---------------------------- ;;;;
+;;;; Create new lexical variables ;;;;
+;;;; ---------------------------- ;;;;
 
 ;; ----------------------
 ;; As function parameters
@@ -18,7 +18,7 @@
       z)
   (list x y z)) ; => (10 20 NIL)
 
-(defun foo (x)
+3(defun foo (x)
   (format t "Parameter: ~a~%" x)      ; |<------ x is argument 
   (let ((x 2))                        ; |
     (format t "Outer LET: ~a~%" x)    ; | |<---- x is 2
@@ -53,3 +53,18 @@
   (format t "Parameter: ~a~%" x))
 
 (foo 33)
+
+
+;;;; ---------------------------- ;;;;
+;;;; Create new dynamic variables ;;;;
+;;;; ---------------------------- ;;;;
+
+(defparameter x 0)
+(defvar y 0)
+(format t "x = ~a~%" x) ; => x = 0
+(format t "y = ~a~%" y) ; => y = 0
+
+(defparameter x 1)
+(defvar y 1)
+(format t "x = ~a~%" x) ; => x = 1
+(format t "y = ~a~%" y) ; => y = 0
