@@ -41,7 +41,6 @@
 (let ((x 10))
   (let ((y (+ x 10)))
     (list x y)))
-
 ;; --------------------------------------
 ;; Using other Lisp forms, like "DOTIMES"
 ;; --------------------------------------
@@ -68,3 +67,7 @@
 (defvar y 1)
 (format t "x = ~a~%" x) ; => x = 1
 (format t "y = ~a~%" y) ; => y = 0
+
+
+(defconstant +GRAVITY+ 9.8)
+(defconstant +GRAVITY+ 10) ; => The constant +GRAVITY+ is being redefined (from 9.8 to 10)
