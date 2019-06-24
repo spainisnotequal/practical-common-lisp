@@ -39,3 +39,32 @@
 (my-unless (equal x 0)
   (format t "First message~%")
   (format t "Second message~%"))
+
+
+;;; ----------------------------------
+;;; Multibranch conditionals with COND
+;;; ----------------------------------
+
+(defparameter s 'o)
+
+;; Multibranch conditionals using IF are not easy to read
+(if (string-equal s 'a)
+    (format t "First vowel~%")
+    (if (string-equal s 'e)
+        (format t "Second vowel~%")
+        (if (string-equal s 'i)
+            (format t "Third vowel~%")
+            (if (string-equal s 'o)
+                (format t "Fourth vowel~%")
+                (if (string-equal s 'u)
+                    (format t "Fifth vowel~%")
+                    (format t "Not a vowel~%"))))))
+
+;; The macro COND abstracts that idea of multibranch conditionals
+(cond
+  ((string-equal s 'a) (format t "First vowel~%"))
+  ((string-equal s 'e) (format t "Second vowel~%"))
+  ((string-equal s 'i) (format t "Third vowel~%"))
+  ((string-equal s 'o) (format t "Fourth vowel~%"))
+  ((string-equal s 'u) (format t "Fifth vowel~%"))
+  (t (format t "Not a vowel~%")))
