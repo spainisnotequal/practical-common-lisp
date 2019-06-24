@@ -101,3 +101,15 @@
     ((= n 10) cur)
   (format t "fib #~d = ~d~%" (1+ n) cur)) ; (1+ n) only increments "n" in the
                                           ; "format" Lisp-form
+
+;;; ---------------
+;;; Loops with LOOP
+;;; ---------------
+
+;; Lispy style
+(do (nums (i 1 (1+ i)))
+    ((> i 10) (nreverse nums))
+  (push i nums))                       ; => (1 2 3 4 5 6 7 8 9 10)
+
+;; un-Lispy style
+(loop for i from 1 to 10 collecting i) ; => (1 2 3 4 5 6 7 8 9 10)
