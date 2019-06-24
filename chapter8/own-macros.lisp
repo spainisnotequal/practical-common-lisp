@@ -47,3 +47,14 @@
      ,@body))
 
 (do-primes (p 0 19) (print p)) ; prints 2 3 5 7 11 13 17 19
+
+;; Third version (not an improvement, just to show how handy is the backquote):
+(defmacro do-primes ((var start end) &body body)
+  (append '(do)
+          (list  (list (list var
+                             (list 'next-prime start)
+                             (list 'next-prime (list '1+ var)))))
+          (list (list (list '> var end)))
+          body))
+
+(do-primes (p 0 19) (print p)) ; prints 2 3 5 7 11 13 17 19
