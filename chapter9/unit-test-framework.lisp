@@ -53,3 +53,35 @@
     (= (+ 1 2 3) 6)
     (= (+ -1 -3) -4)))
 
+;;; -----------------------
+;;; Fixing the return value
+;;; -----------------------
+
+;; Second version of REPORT-RESULT function
+(defun report-result (result form)
+  (format t "~:[FAIL~;pass~] ... ~a~%" result form)
+  result)
+
+;; WITH-GEMSYMS macro (from chapter 8):
+(defmacro with-gensyms ((&rest names) &body body)
+  `(let ,(loop for n in names collect `(,n (gensym)))
+     ,@body))
+
+;; COMBINE-RESULTS macro
+(defmacro combine-results (&body forms)
+  (with-gensyms (result)
+    `(let ((,result t))
+       ,@(loop for f in forms collect `(unless ,f (setf ,result nil)))
+       ,result)))
+
+;; Third version of the CHECK macro
+(defmacro check (&body forms)
+  `(combine-results
+     ,@(loop for f in forms collect `(report-result ,f ',f))))
+
+;; TEST-+ that fails the second test
+(defun test-+ ()
+  (check
+    (= (+ 1 2) 3)
+    (= (+ 1 2 3) 7)
+    (= (+ -1 -3) -4)))
