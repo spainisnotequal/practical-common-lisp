@@ -145,3 +145,29 @@
   (PRINT ENDING-VALUE))
 
 ;; Now, the variable used to hold the ending value is the gensymed symbol #:G538
+
+
+;;; --------------------------------------------------------------------------
+;;; WITH-GEMSYMS macro to abstract the LET ... GEMSYM variable name generation
+;;; --------------------------------------------------------------------------
+
+;; WITH-GEMSYMS macro:
+(defmacro with-gensyms ((&rest names) &body body)
+  `(let ,(loop for n in names collect `(,n (gensym)))
+     ,@body))
+
+;; We want to be able to write something like this:
+(defmacro do-primes ((var start end) &body body)
+  (with-gensyms (ending-value-name)
+    `(do ((,var (next-prime ,start) (next-prime (1+ ,var)))
+          (,ending-value-name ,end))
+         ((> ,var ,ending-value-name))
+       ,@body)))
+
+;; which expands to (C-c RET, with the cursor in the first parenthesis of the
+;; WITH_GENSYMS expression:
+(LET ((ENDING-VALUE-NAME (GENSYM)))
+  `(DO ((,VAR (NEXT-PRIME ,START) (NEXT-PRIME (1+ ,VAR)))
+        (,ENDING-VALUE-NAME ,END))
+       ((> ,VAR ,ENDING-VALUE-NAME))
+    ,@BODY))
