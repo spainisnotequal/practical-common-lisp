@@ -64,11 +64,13 @@
 
 ;; WITH-GEMSYMS macro (from chapter 8):
 (defmacro with-gensyms ((&rest names) &body body)
+  "Creates new variables with unique symbols to be used in macro's expansions"
   `(let ,(loop for n in names collect `(,n (gensym)))
      ,@body))
 
 ;; COMBINE-RESULTS macro
 (defmacro combine-results (&body forms)
+  "Works like the AND logical operator but running all forms instead of stopping when a forms returns NIL"
   (with-gensyms (result)
     `(let ((,result t))
        ,@(loop for f in forms collect `(unless ,f (setf ,result nil)))
