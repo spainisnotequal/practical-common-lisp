@@ -150,28 +150,3 @@
   (combine-results
     (test-+)
     (test-*)))
-
-;; My particular version of the DEFTEST macro
-;; ------------------------------------------
-
-;; DEFTEST macro that includes inside its body the CHECK macro
-(defmacro deftest (name parameters &body body)
-  `(defun ,name ,parameters
-     (let ((*test-name* ',name))
-       (check ,@body))))
-
-;; My version of the TEST-+ function
-(deftest test-+ ()
-  (= (+ 1 2) 3)
-  (= (+ 1 2 3) 7)
-  (= (+ -1 -3) -4))
-
-;; My version of the TEST-* function
-(deftest test-* ()
-  (= (* 2 3) 6))
-
-;; TEST-ARITHMETIC function
-(defun test-arithmetic ()
-  (combine-results
-    (test-+)
-    (test-*)))
