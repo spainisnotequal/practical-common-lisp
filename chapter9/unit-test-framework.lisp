@@ -87,3 +87,37 @@
     (= (+ 1 2) 3)
     (= (+ 1 2 3) 7)
     (= (+ -1 -3) -4)))
+
+;;; -----------------------
+;;; Better result reporting
+;;; -----------------------
+
+;; Use a dynamic (global) variable to bind which test we are running each time
+;; we run REPORT-RESULT from CHECK
+(defvar *test-name* nil)
+
+;; Third version of REPORT-RESULT function
+(defun report-result (result form)
+  (format t "~:[FAIL~;pass~] ... ~a: ~a~%" result *test-name* form)
+  result)
+
+;; TEST-+
+(defun test-+ ()
+  (let ((*test-name* 'test-+))
+    (check
+      (= (+ 1 2) 3)
+      (= (+ 1 2 3) 7)
+      (= (+ -1 -3) -4))))
+
+;; TEST-* function
+(defun test-* ()
+  (let ((*test-name* 'test-*))
+    (check
+      (= (* 2 2) 4)
+      (= (* -3 5) -15))))
+
+;; TEST-ARITHMETIC function
+(defun test-arithmetic ()
+  (combine-results
+    (test-+)
+    (test-*)))
