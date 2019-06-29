@@ -150,3 +150,36 @@
   (combine-results
     (test-+)
     (test-*)))
+
+;;; --------------------
+;;; A hierarchy of tests
+;;; --------------------
+
+;; Second version of DEFTEST to support multiple levels of test functions
+(defmacro deftest (name parameters &body body)
+  `(defun ,name ,parameters
+     (let ((*test-name* (append *test-name* (list ',name))))
+       ,@body)))
+
+;; recompile TEST-+
+(deftest test-+ ()
+  (check
+   (= (+ 1 2) 3)
+   (= (+ 1 2 3) 7)
+   (= (+ -1 -3) -4)))
+
+;; recompile TEST-*
+(deftest test-* ()
+  (check
+    (= (* 2 2) 4)
+    (= (* -3 5) -15)))
+
+;; Now define TEST-ARITHMETIC with DEFTEST instead of with DEFUN
+(deftest test-arithmetic ()
+  (combine-results
+    (test-+)
+    (test-*)))
+
+;; Add another layer on top of TEST-ARITHMETIC
+(deftest test-math ()
+  (test-arithmetic))
