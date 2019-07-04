@@ -31,5 +31,28 @@
 *v*                  ; => #(0)
 (vector-pop *v*)     ; => 0
 *v*                  ; => #()
-(vector-pop *v*)     ; => Evaluation aborted on #<SIMPLE-ERROR "There is nothing
-                     ; left to pop." {51AF1369}>.
+(vector-pop *v*)     ; => ERROR - "There is nothing left to pop."
+
+;;; --------------------
+;;; Length of a sequence
+;;; --------------------
+
+(defparameter *v* (vector -3 9 5))
+
+(length *v*) ; => 3
+
+;;; ------------------------------------
+;;; Access to the elements of a sequence
+;;; ------------------------------------
+
+(defparameter *v* (vector -3 9 5))
+
+(elt *v* 0) ; => -3
+(elt *v* 1) ; => 9
+(elt *v* 2) ; => 5
+(elt *v* 3) ; => ERROR - "The index 3 is too large."
+
+;; ELT is a SETFable place, so you can set the value of a particular element
+;; like this:
+(setf (elt *v* 1) -11) ; => -11
+*v*                    ; => #(-3 -11 5)
