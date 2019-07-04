@@ -99,3 +99,40 @@
 ;; :from-end keyword
 (find 'a #((a 10) (b 20) (a 30) (b 40)) :key #'first)             ; => (A 10)
 (find 'a #((a 10) (b 20) (a 30) (b 40)) :key #'first :from-end t) ; => (A 30)
+
+;;; --------------------------------------------------------------
+;;; Higher-Order variants of these finding and filtering functions
+;;; --------------------------------------------------------------
+
+(count-if-not #'evenp '(1 2 3 1 2 3)) ; => 4
+(count-if #'evenp '(1 2 3 1 2 3))     ; => 2
+
+(remove-if-not #'digit-char-p "user1234") ; => "1234"
+(remove-if #'digit-char-p "user1234")     ; => "user" 
+
+(substitute-if-not #\*
+                   #'(lambda (char)
+                       (find char "aeiou" :test #'char-equal))
+                   "Spain") ; => "**ai*"
+(substitute-if #\*
+               #'(lambda (char)
+                   (find char "aeiou" :test #'char-equal))
+               "Spain")     ; => "Sp**n"
+
+(find-if-not #'(lambda (x) (>= x 3))
+             #(1 2 3 1 2 3)) ; => 1
+(find-if #'(lambda (x) (>= x 3))
+         #(1 2 3 1 2 3))     ; => 3
+
+(position-if-not #'evenp '(1 2 3 1 2 3)) ; => 0
+(position-if #'evenp '(1 2 3 1 2 3))     ; => 1
+
+;; REMOVE-IF-NOT is a very common and useful function, that returns a copy of
+;; sequence with elements not satisfying PREDICATE removed.
+;; (It's like FILTER in Python, or GREP in Perl.)
+
+(remove-if-not #'digit-char-p "user1234") ; => "1234"
+
+(remove-if-not #'(lambda (char)
+                   (find char "aeiou" :test #'char-equal))
+               "Keep the vowels in this text") ; =>   "eeeoeiie" 
