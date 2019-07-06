@@ -252,3 +252,19 @@
 ;; MEMBER (only works for lists)
 (member 9 '(5 9 1 2)) ; => (9 1 2) 
 (member 8 '(5 9 1 2)) ; => NIL
+
+;;; -------------------
+;;; Sequence predicates
+;;; -------------------
+
+;; One sequence only
+(every #'evenp '(1 2 3 4))    ; => NIL
+(some #'evenp '(1 2 3 4))     ; => T
+(notany #'evenp '(1 2 3 4))   ; => NIL
+(notevery #'evenp '(1 2 3 4)) ; => T
+
+;; Two sequences
+(every #'= '(1 2 3 4) '(5 4 3 2))    ; => NIL
+(some #'= '(1 2 3 4) '(5 4 3 2))     ; => T
+(notany #'= '(1 2 3 4) '(5 4 3 2))   ; => NIL
+(notevery #'= '(1 2 3 4) '(5 4 3 2)) ; => T
