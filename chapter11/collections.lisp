@@ -141,3 +141,19 @@
 ;; REMOVE-DUPLICATES, that removes all but one instance of each duplicated
 ;; element of the given sequence
 (remove-duplicates '(1 2 1 2 3 1 2 3 4)) ; => (1 2 3 4)
+
+;;; -----------------------------------
+;;; Other useful sequence manipulations
+;;; -----------------------------------
+
+(copy-seq '(1 2 3)) ; => (1 2 3)
+(reverse '(1 2 3))  ; => (3 2 1)
+
+(concatenate 'list '(1 2 3) '(4 5 6))      ; => (1 2 3 4 5 6)
+(concatenate 'list #(1 2 3) '(4 5 6))      ; => (1 2 3 4 5 6)
+
+(concatenate 'vector #(1 2 3) '(4 5 6))    ; => #(1 2 3 4 5 6)
+(concatenate 'vector #(1 2 3) #(4 5 6))    ; => #(1 2 3 4 5 6)
+
+(concatenate 'string "abc" "DEF")          ; => "abcDEF"
+(concatenate 'string "abc" '(#\D #\E #\F)) ; => "abcDEF"
