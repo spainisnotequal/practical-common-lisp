@@ -185,7 +185,6 @@
 ;; of sort, you don't need an assignment.
 ;; So it is a good practise to always do something with the return value of a
 ;; sorting funtion since these functions can destroy the sequence.
-
 ;;
 ;; There are two reasons for this. First, an implementation is allowed to use
 ;; non-destructive copying to implement destructive operations. Secondly,
@@ -194,7 +193,7 @@
 ;;
 ;; Here's an example of the second problem (run under SBCL):
 (let ((xs (list 4 3 2 1)))
-  (sort xs '<)
+  (sort xs #'<)
   xs)                     ; => (3 4)
 
 ;; In SBCL, we get the following warning:
@@ -203,5 +202,5 @@
 
 ;; So to avoid this problem, we need to do the assignment:
 (let ((xs (list 4 3 2 1)))
-  (setf xs (sort xs '<))
+  (setf xs (sort xs #'<))
   xs)                     ; => (1 2 3 4)
