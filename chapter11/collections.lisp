@@ -211,3 +211,44 @@
 
 (merge 'vector #(1 3 5) #(2 4 6) #'<) ; => #(1 2 3 4 5 6)
 (merge 'list #(1 3 5) #(2 4 6) #'<)   ; => (1 2 3 4 5 6)
+
+;;; -----------------------
+;;; Sub-sequence operations
+;;; -----------------------
+
+;; SUBSEQ
+(subseq "newspaperman" 9)   ; => "man"
+(subseq "newspaperman" 4 9) ; => "paper"
+(subseq "newspaperman" 0 4) ; => "news"
+
+(subseq '(1 2 3 4) 3)   ; => (4)
+(subseq '(1 2 3 4) 1 3) ; => (2 3)
+
+;; POSITION
+(position 'man '(news paper man)) ; => 2
+(position 'men '(news paper man)) ; => NIL
+
+(position #\w "newspaperman") ; => 2
+(position #\z "newspaperman") ; => NIL
+
+(position 9 #(5 9 1 2)) ; => 1
+(position 8 #(5 9 1 2)) ; => NIL
+
+;;SEARCH
+(search '(man) '(news paper man)) ; => 2
+(search '(men) '(news paper man)) ; => NIL
+
+(search "man" "newspaperman") ; => 9
+(search "men" "newspaperman") ; => NIL
+
+(search #(9) #(5 9 1 2)) ; => 1
+(search #(8) #(5 9 1 2)) ; => NIL
+
+;; MISMATCH
+(mismatch "newspaperman" "newton") ; => 3
+(mismatch "newspaperman" "paperman") ; => 0
+(mismatch "newspaperman" "paperman" :from-end t) ; => 4
+
+;; MEMBER (only works for lists)
+(member 9 '(5 9 1 2)) ; => (9 1 2) 
+(member 8 '(5 9 1 2)) ; => NIL
