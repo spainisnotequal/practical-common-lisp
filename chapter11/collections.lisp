@@ -268,3 +268,44 @@
 (some #'= '(1 2 3 4) '(5 4 3 2))     ; => T
 (notany #'= '(1 2 3 4) '(5 4 3 2))   ; => NIL
 (notevery #'= '(1 2 3 4) '(5 4 3 2)) ; => T
+
+;;; ------------------------------------------
+;;; Sequence mapping functions: MAP and REDUCE
+;;; ------------------------------------------
+
+;; MAP function
+(map 'list #'(lambda (x) (* x x)) '(1 2 3)) ; => (1 4 9)
+(map 'vector #'* '(1 2 3) '(4 5 6))         ; => #(4 10 18)
+
+;; MAP-INTO function
+(defparameter a #(1 0 0))
+(defparameter b #(0 1 0))
+(defparameter c #(0 0 1))
+
+(map-into a #'+ a b c) ; => #(1 1 1)
+(print a)              ; => #(1 1 1)
+
+(defparameter d #(4))
+(defparameter e #(1 0 0 4))
+
+(map-into a #'+ a d) ; => #(5 1 1)
+(print a)            ; => #(5 1 1)
+
+(map-into a #'+ a e) ; => #(6 1 1)
+(print a)            ; => #(6 1 1)
+
+;; REDUCE function
+(reduce #'+ #(1 2 3 4))   ; => 10
+(reduce #'min #(1 2 3 4)) ; => 1
+(reduce #'max #(1 2 3 4)) ; => 4
+
+(defun average (list)
+  (/ (reduce #'+ list)
+     (length list)))
+
+(average #(1 2 3 4))      ; => 5/2
+
+(reduce (lambda (x y) (+ (* x 10) y)) '(1 2 3 4)) ; => 1234
+
+(reduce #'append '((1) (2)) :initial-value '(i n i t)) ; =>  (I N I T 1 2)
+(reduce #'list '(1 2 3 4) :initial-value 'foo)         ; => ((((FOO 1) 2) 3) 4)
