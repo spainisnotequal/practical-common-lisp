@@ -157,3 +157,24 @@
 
 (concatenate 'string "abc" "DEF")          ; => "abcDEF"
 (concatenate 'string "abc" '(#\D #\E #\F)) ; => "abcDEF"
+
+;;; -------------------------------------------------------
+;;; Sorting functions (be careful, as they are destructive)
+;;; -------------------------------------------------------
+
+(defparameter my-seq-1 '(2 1 5 3 4))
+(defparameter my-seq-2 '(2 1 5 3 4))
+
+;; SORT (and STABLE-SORT) modifies the original sequence
+(sort my-seq-1 #'<) ; => (1 2 3 4 5)
+(print my-seq-1)    ; => (1 2 3 4 5)
+
+;; to avoid the modification of the original sequence, use COPY-SEQ
+(sort (copy-seq my-seq-2) #'<) ; => (1 2 3 4 5)
+(print my-seq-2)               ; => (2 1 5 3 4)
+
+;; SORT-STABLE guarantees not to reorder any elements cosidered equivalent by
+;; the predicate, while SORT guarantees only that the result is sorted (it may
+;; reorder equivalent elements)
+(stable-sort my-seq-1 #'<) ; => (1 2 3 4 5)
+(print my-seq-1)           ; => (1 2 3 4 5)
