@@ -135,4 +135,9 @@
 
 (remove-if-not #'(lambda (char)
                    (find char "aeiou" :test #'char-equal))
-               "Keep the vowels in this text") ; =>   "eeeoeiie" 
+               "Keep the vowels in this text") ; =>   "eeeoeiie"
+
+;; The REMOVE family of functions also support a fourth variant,
+;; REMOVE-DUPLICATES, that removes all but one instance of each duplicated
+;; element of the given sequence
+(remove-duplicates '(1 2 1 2 3 1 2 3 4)) ; => (1 2 3 4)
