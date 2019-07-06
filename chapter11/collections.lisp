@@ -178,3 +178,30 @@
 ;; reorder equivalent elements)
 (stable-sort my-seq-1 #'<) ; => (1 2 3 4 5)
 (print my-seq-1)           ; => (1 2 3 4 5)
+
+;; A very important question: if you want your variable to contain the proper
+;; value of the sorted sequence after sorting a sequence, it is necessary to do
+;; the assignment. If you don't care about that and only want the return value
+;; of sort, you don't need an assignment.
+;; So it is a good practise to always do something with the return value of a
+;; sorting funtion since these functions can destroy the sequence.
+
+;;
+;; There are two reasons for this. First, an implementation is allowed to use
+;; non-destructive copying to implement destructive operations. Secondly,
+;; destructive operations on lists can permute the conses such that the value
+;; passed into the operation no longer points to the first cons of the sequence.
+;;
+;; Here's an example of the second problem (run under SBCL):
+(let ((xs (list 4 3 2 1)))
+  (sort xs '<)
+  xs)                     ; => (3 4)
+
+;; In SBCL, we get the following warning:
+;;   caught STYLE-WARNING:
+;;     The return value of STABLE-SORT-LIST should not be discarded.
+
+;; So to avoid this problem, we need to do the assignment:
+(let ((xs (list 4 3 2 1)))
+  (setf xs (sort xs '<))
+  xs)                     ; => (1 2 3 4)
