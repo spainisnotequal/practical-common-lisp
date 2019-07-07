@@ -285,6 +285,8 @@
 (map-into a #'+ a b c) ; => #(1 1 1)
 (print a)              ; => #(1 1 1)
 
+(map-into d #'+ a b c) ; => ERROR: The variable D is unbound.
+
 (defparameter d #(4))
 (defparameter e #(1 0 0 4))
 
