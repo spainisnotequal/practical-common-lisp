@@ -47,14 +47,15 @@
 
 (defparameter *v* (vector -3 9 5))
 
-(elt *v* 0) ; => -3
-(elt *v* 1) ; => 9
-(elt *v* 2) ; => 5
-(elt *v* 3) ; => ERROR - "The index 3 is too large."
+(aref *v* 0) ; => -3
+(aref *v* 1) ; => 9
+(aref *v* 2) ; => 5
+(aref *v* 3) ; => ERROR - "Invalid index 3 for (SIMPLE-VECTOR 3), should be a
+             ;             non-negative integer below 3."
 
-;; ELT is a SETFable place, so you can set the value of a particular element
+;; AREF is a SETFable place, so you can set the value of a particular element
 ;; like this:
-(setf (elt *v* 1) -11) ; => -11
+(setf (aref *v* 1) -11) ; => -11
 *v*                    ; => #(-3 -11 5)
 
 ;;; -----------------------------------------------------
