@@ -1,6 +1,6 @@
-;;;; ----------- ;;;;
-;;;; COLLECTIONS ;;;;
-;;;; ----------- ;;;;
+;;;; ------- ;;;;
+;;;; VECTORS ;;;;
+;;;; ------- ;;;;
 
 ;;; -------------------------
 ;;; Create vectors and arrays
@@ -315,3 +315,101 @@
 
 (reduce #'append '((1) (2)) :initial-value '(i n i t)) ; =>  (I N I T 1 2)
 (reduce #'list '(1 2 3 4) :initial-value 'foo)         ; => ((((FOO 1) 2) 3) 4)
+
+
+;;;; ----------- ;;;;
+;;;; HASH TABLES ;;;;
+;;;; ----------- ;;;;
+
+;;; -------------------------------------------
+;;; Defining a hash table, and inserting values
+;;; -------------------------------------------
+
+(defparameter *fruits* (make-hash-table))
+(gethash 1 *fruits*) ; => NIL, NIL
+(setf (gethash 1 *fruits*) "orange")
+(gethash 1 *fruits*) ; => "orange", T
+(setf (gethash 2 *fruits*) "watermelon")
+(gethash 2 *fruits*) ; => "watermelon", T
+
+;; But if we want to use strings as keys, we need to define the hash table in
+;; a slightly different way (using the ":test #'equal" parameter)
+
+;; Incorrect:
+(defparameter *stock* (make-hash-table))
+(setf (gethash "orange" *stock*) 33)
+(gethash "orange" *stock*) ; => NIL, NIL
+
+;; Correct:
+(defparameter *stock* (make-hash-table :test #'equal))
+(setf (gethash "orange" *stock*) 33)
+(gethash "orange" *stock*) ; => 33, T
+(setf (gethash "watermelon" *stock*) 12)
+(gethash "watermelon" *stock*) ; => 12, T
+
+;;; --------------------------------------------------------------------
+;;; Using MULTIPLE-VALUE-BIND to capture both values returned by GETHASH
+;;; --------------------------------------------------------------------
+
+(defun show-value (key hash-table)
+  (multiple-value-bind (value present) (gethash key hash-table)
+    (if present
+        (format nil "Value ~a actually present." value)
+        (format nil "Value ~a because key not found." value))))
+
+(setf (gethash 3 *fruits*) nil)
+(gethash 3 *fruits*) ; => NIL, T
+
+(show-value 1 *fruits*) ; => "Value ORANGE actually present."
+(show-value 3 *fruits*) ; => "Value NIL actually present."
+(show-value 4 *fruits*) ; => "Value NIL because key not found."
+
+;;; -----------------------------------------------------------------
+;;; Deleting a key/value pair, and completely clearing the hash table
+;;; -----------------------------------------------------------------
+
+(remhash 3 *fruits*)
+(gethash 3 *fruits*) ; => NIL, NIL
+(gethash 1 *fruits*) ; => "orange", T
+
+(clrhash *fruits*)
+(gethash 1 *fruits*) ; => NIL, NIL
+
+;;; ----------------------------------------------------
+;;; Iterating through a hash table with MAPHASH and LOOP
+;;; ----------------------------------------------------
+
+(defparameter *t* (make-hash-table))
+(setf (gethash 1 *t*) "one")
+(setf (gethash 2 *t*) "two")
+(setf (gethash 3 *t*) "three")
+(setf (gethash 4 *t*) "four")
+(setf (gethash 5 *t*) "five")
+
+(maphash #'(lambda (k v)
+             (format t "~a => ~a~%" k v))
+         *t*)
+
+(loop for k being the hash-keys in *t* using (hash-value v)
+   do (format t "~a => ~a~%" k v))
+
+;; Adding or removing elements from a hash table while iterating over it are not
+;; specified (undefined behaviour), with two exceptions:
+;;   - you can use SETF with GETHASH to change the value of the current entry.
+;;   - you can use REMHASH to remove the current entry.
+
+;; Change the current value:
+(maphash #'(lambda (k v)
+             (if (oddp k)
+                 (setf (gethash k *t*) (string-upcase v))))
+         *t*)
+
+(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) *t*)
+
+;; Remove the current value if its key it a even number:
+(maphash #'(lambda (k v)
+             (if (evenp k)
+                 (remhash k *t*)))
+         *t*)
+
+(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) *t*)
