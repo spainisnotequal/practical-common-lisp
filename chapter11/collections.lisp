@@ -406,7 +406,7 @@
 
 (maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) *t*)
 
-;; Remove the current value if its key it a even number:
+;; Remove the current value if its key is an even number:
 (maphash #'(lambda (k v)
              (if (evenp k)
                  (remhash k *t*)))
