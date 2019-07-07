@@ -289,12 +289,16 @@
 
 (defparameter d #(4))
 (defparameter e #(1 0 0 4))
+(defparameter f #())
 
 (map-into a #'+ a d) ; => #(5 1 1)
 (print a)            ; => #(5 1 1)
 
 (map-into a #'+ a e) ; => #(6 1 1)
 (print a)            ; => #(6 1 1)
+
+(map-into f #'+ a e) ; => #()
+(print f)            ; => #()
 
 ;; REDUCE function
 (reduce #'+ #(1 2 3 4))   ; => 10
