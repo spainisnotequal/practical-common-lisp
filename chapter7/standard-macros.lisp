@@ -74,7 +74,7 @@
 ;;; Loops with DOLIST and DOTIMES
 ;;; -----------------------------
 
-(dolist (x '(1 2 3))
+(dolist (x (list 1 2 3))
   (print x))
 
 (dotimes (x 4)

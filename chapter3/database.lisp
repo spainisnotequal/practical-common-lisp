@@ -76,18 +76,18 @@
 ;; Querying the database
 ;; ---------------------
 
-(remove-if-not #'evenp '(1 2 3 4 5 6 7 8 9 10)) ; extract the even elements
-(remove-if-not #'oddp '(1 2 3 4 5 6 7 8 9 10)) ; extract the even elements
+(remove-if-not #'evenp (list 1 2 3 4 5 6 7 8 9 10)) ; extract the even elements
+(remove-if-not #'oddp (list 1 2 3 4 5 6 7 8 9 10)) ; extract the even elements
 
 ;; Select the even elements without using evenp
 (remove-if-not
  #'(lambda (x) (= 0 (mod x 2)))
- '(1 2 3 4 5 6 7 8 9 10))
+ (list 1 2 3 4 5 6 7 8 9 10))
 
 ;; Select the odd elements without using oddp
 (remove-if-not
  #'(lambda (x) (= 1 (mod x 2)))
- '(1 2 3 4 5 6 7 8 9 10))
+ (list 1 2 3 4 5 6 7 8 9 10))
 
 ;; Select all the Dixie Chicks' albums
 (remove-if-not

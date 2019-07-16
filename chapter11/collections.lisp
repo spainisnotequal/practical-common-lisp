@@ -56,57 +56,69 @@
 ;; AREF is a SETFable place, so you can set the value of a particular element
 ;; like this:
 (setf (aref *v* 1) -11) ; => -11
-*v*                    ; => #(-3 -11 5)
+*v*                     ; => #(-3 -11 5)
 
 ;;; -----------------------------------------------------
 ;;; Finding and filtering specific elements of a sequence
 ;;; -----------------------------------------------------
 
-(count 1 '(1 2 3 1 2 3)) ; => 2
+(count 1 (list 1 2 3 1 2 3)) ; => 2
 
-(remove 1 #(1 2 3 1 2 3)) ; => #(2 3 2 3)
-(remove 1 '(1 2 3 1 2 3)) ; => (2 3 2 3)
-(remove #\a "foobarbaz")  ; => "foobrbz"
+(remove 1 (vector 1 2 3 1 2 3)) ; => #(2 3 2 3)
+(remove 1 (list 1 2 3 1 2 3))   ; => (2 3 2 3)
+(remove #\a "foobarbaz")        ; => "foobrbz"
 
-(substitute 9 1 #(1 2 3 1 2 3))  ; => #(9 2 3 9 2 3)
-(substitute 9 1 '(1 2 3 1 2 3))  ; => (9 2 3 9 2 3)
-(substitute #\A #\a "foobarbaz") ; => "foobArbAz"
+(substitute 9 1 (vector 1 2 3 1 2 3))  ; => #(9 2 3 9 2 3)
+(substitute 9 1 (list 1 2 3 1 2 3))    ; => (9 2 3 9 2 3)
+(substitute #\A #\a "foobarbaz")       ; => "foobArbAz"
 
-(find 1 #(1 2 3 1 2 3)) ; => 1
-(find 1 '(1 2 3 1 2 3)) ; => 1
-(find #\a "foobarbaz")  ; => #\a
+(find 1 (vector 1 2 3 1 2 3)) ; => 1
+(find 1 (list 1 2 3 1 2 3))   ; => 1
+(find #\a "foobarbaz")        ; => #\a
 
-(position 1 '(1 2 3 1 2 3)) ; => 0
-(position #\a "foobarbaz")  ; => 4
+(position 1 (list 1 2 3 1 2 3)) ; => 0
+(position #\a "foobarbaz")      ; => 4
 
 ;; We can use keyword arguments to modify the behaviour of these functions
 
 ;; :test keyword
-(remove 2 '(1 2 3 1 2 3)
-        :test #'>=)       ; => (3 3)
-(remove 2 '(1 2 3 1 2 3)
+(remove 2 (list 1 2 3 1 2 3)
+        :test #'>=)                      ; => (3 3)
+(remove 2 (list 1 2 3 1 2 3)
         :test #'(lambda (x y) (>= x y))) ; => (3 3)
 
-(remove 2 '(1 2 3 1 2 3)
-        :test (complement #'>=)) ; => (1 2 1 2)
+(remove 2 (list 1 2 3 1 2 3)
+        :test (complement #'>=))         ; => (1 2 1 2)
 
 ;; :key keyword
-(remove 2 '((1 "one") (2 "two") (3 "three"))
-        :key #'first)                        ; => ((1 "one") (3 "three"))
-(remove 2 '((1 "one") (2 "two") (3 "three"))
+(remove 2 (list (list 1 "one")
+                (list 2 "two")
+                (list 3 "three"))
+        :key #'first)             ; => ((1 "one") (3 "three"))
+(remove 2 (list (list 1 "one")
+                (list 2 "two")
+                (list 3 "three"))
         :test #'>=
-        :key #'first)                        ; => (3 "three")
+        :key #'first)             ; => (3 "three")
 
 ;; :from-end keyword
-(find 'a #((a 10) (b 20) (a 30) (b 40)) :key #'first)             ; => (A 10)
-(find 'a #((a 10) (b 20) (a 30) (b 40)) :key #'first :from-end t) ; => (A 30)
+(find 'a (vector (list 'a 10)
+                 (list 'b 20)
+                 (list 'a 30)
+                 (list 'b 40))
+      :key #'first)             ; => (A 10)
+(find 'a (vector (list 'a 10)
+                 (list 'b 20)
+                 (list 'a 30)
+                 (list 'b 40))
+      :key #'first :from-end t) ; => (A 30)
 
 ;;; --------------------------------------------------------------
 ;;; Higher-Order variants of these finding and filtering functions
 ;;; --------------------------------------------------------------
 
-(count-if-not #'evenp '(1 2 3 1 2 3)) ; => 4
-(count-if #'evenp '(1 2 3 1 2 3))     ; => 2
+(count-if-not #'evenp (list 1 2 3 1 2 3)) ; => 4
+(count-if #'evenp (list 1 2 3 1 2 3))     ; => 2
 
 (remove-if-not #'digit-char-p "user1234") ; => "1234"
 (remove-if #'digit-char-p "user1234")     ; => "user" 
@@ -121,12 +133,12 @@
                "Spain")     ; => "Sp**n"
 
 (find-if-not #'(lambda (x) (>= x 3))
-             #(1 2 3 1 2 3)) ; => 1
+             (vector 1 2 3 1 2 3))    ; => 1
 (find-if #'(lambda (x) (>= x 3))
-         #(1 2 3 1 2 3))     ; => 3
+         (vector 1 2 3 1 2 3))        ; => 3
 
-(position-if-not #'evenp '(1 2 3 1 2 3)) ; => 0
-(position-if #'evenp '(1 2 3 1 2 3))     ; => 1
+(position-if-not #'evenp (list 1 2 3 1 2 3)) ; => 0
+(position-if #'evenp (list 1 2 3 1 2 3))     ; => 1
 
 ;; REMOVE-IF-NOT is a very common and useful function, that returns a copy of
 ;; sequence with elements not satisfying PREDICATE removed.
@@ -141,30 +153,30 @@
 ;; The REMOVE family of functions also support a fourth variant,
 ;; REMOVE-DUPLICATES, that removes all but one instance of each duplicated
 ;; element of the given sequence
-(remove-duplicates '(1 2 1 2 3 1 2 3 4)) ; => (1 2 3 4)
+(remove-duplicates (list 1 2 1 2 3 1 2 3 4)) ; => (1 2 3 4)
 
 ;;; -----------------------------------
 ;;; Other useful sequence manipulations
 ;;; -----------------------------------
 
-(copy-seq '(1 2 3)) ; => (1 2 3)
-(reverse '(1 2 3))  ; => (3 2 1)
+(copy-seq (list 1 2 3)) ; => (1 2 3)
+(reverse (list 1 2 3))  ; => (3 2 1)
 
-(concatenate 'list '(1 2 3) '(4 5 6))      ; => (1 2 3 4 5 6)
-(concatenate 'list #(1 2 3) '(4 5 6))      ; => (1 2 3 4 5 6)
+(concatenate 'list (list 1 2 3) (list 4 5 6))        ; => (1 2 3 4 5 6)
+(concatenate 'list (vector 1 2 3) (list 4 5 6))      ; => (1 2 3 4 5 6)
 
-(concatenate 'vector #(1 2 3) '(4 5 6))    ; => #(1 2 3 4 5 6)
-(concatenate 'vector #(1 2 3) #(4 5 6))    ; => #(1 2 3 4 5 6)
+(concatenate 'vector (vector 1 2 3) (list 4 5 6))    ; => #(1 2 3 4 5 6)
+(concatenate 'vector (vector 1 2 3) (vector 4 5 6))  ; => #(1 2 3 4 5 6)
 
-(concatenate 'string "abc" "DEF")          ; => "abcDEF"
-(concatenate 'string "abc" '(#\D #\E #\F)) ; => "abcDEF"
+(concatenate 'string "abc" "DEF")              ; => "abcDEF"
+(concatenate 'string "abc" (list #\D #\E #\F)) ; => "abcDEF"
 
 ;;; -------------------------------------------------------
 ;;; Sorting functions (be careful, as they are destructive)
 ;;; -------------------------------------------------------
 
-(defparameter my-seq-1 '(2 1 5 3 4))
-(defparameter my-seq-2 '(2 1 5 3 4))
+(defparameter my-seq-1 (list 2 1 5 3 4))
+(defparameter my-seq-2 (list 2 1 5 3 4))
 
 ;; SORT (and STABLE-SORT) modifies the original sequence
 (sort my-seq-1 #'<) ; => (1 2 3 4 5)
@@ -195,7 +207,7 @@
 ;; Here's an example of the second problem (run under SBCL):
 (let ((xs (list 4 3 2 1)))
   (sort xs #'<)
-  xs)                     ; => (3 4)
+  xs)                       ; => (3 4)
 
 ;; In SBCL, we get the following warning:
 ;;   caught STYLE-WARNING:
@@ -204,14 +216,14 @@
 ;; So to avoid this problem, we need to do the assignment:
 (let ((xs (list 4 3 2 1)))
   (setf xs (sort xs #'<))
-  xs)                     ; => (1 2 3 4)
+  xs)                       ; => (1 2 3 4)
 
 ;;; -------------------
 ;;; Merge two sequences
 ;;; -------------------
 
-(merge 'vector #(1 3 5) #(2 4 6) #'<) ; => #(1 2 3 4 5 6)
-(merge 'list #(1 3 5) #(2 4 6) #'<)   ; => (1 2 3 4 5 6)
+(merge 'vector (vector 1 3 5) (vector 2 4 6) #'<) ; => #(1 2 3 4 5 6)
+(merge 'list (vector 1 3 5) (vector 2 4 6) #'<)   ; => (1 2 3 4 5 6)
 
 ;;; -----------------------
 ;;; Sub-sequence operations
@@ -222,75 +234,75 @@
 (subseq "newspaperman" 4 9) ; => "paper"
 (subseq "newspaperman" 0 4) ; => "news"
 
-(subseq '(1 2 3 4) 3)   ; => (4)
-(subseq '(1 2 3 4) 1 3) ; => (2 3)
+(subseq (list 1 2 3 4) 3)   ; => (4)
+(subseq (list 1 2 3 4) 1 3) ; => (2 3)
 
 ;; POSITION
-(position 'man '(news paper man)) ; => 2
-(position 'men '(news paper man)) ; => NIL
+(position 'man (list 'news 'paper 'man)) ; => 2
+(position 'men (list 'news 'paper 'man)) ; => NIL
 
 (position #\w "newspaperman") ; => 2
 (position #\z "newspaperman") ; => NIL
 
-(position 9 #(5 9 1 2)) ; => 1
-(position 8 #(5 9 1 2)) ; => NIL
+(position 9 (vector 5 9 1 2)) ; => 1
+(position 8 (vector 5 9 1 2)) ; => NIL
 
 ;;SEARCH
-(search '(man) '(news paper man)) ; => 2
-(search '(men) '(news paper man)) ; => NIL
+(search (list 'man) (list 'news 'paper 'man)) ; => 2
+(search (list 'men) (list 'news 'paper 'man)) ; => NIL
 
 (search "man" "newspaperman") ; => 9
 (search "men" "newspaperman") ; => NIL
 
-(search #(9) #(5 9 1 2)) ; => 1
-(search #(8) #(5 9 1 2)) ; => NIL
+(search (vector 9) (vector 5 9 1 2)) ; => 1
+(search (vector 8) (vector 5 9 1 2)) ; => NIL
 
 ;; MISMATCH
-(mismatch "newspaperman" "newton") ; => 3
-(mismatch "newspaperman" "paperman") ; => 0
+(mismatch "newspaperman" "newton")               ; => 3
+(mismatch "newspaperman" "paperman")             ; => 0
 (mismatch "newspaperman" "paperman" :from-end t) ; => 4
 
 ;; MEMBER (only works for lists)
-(member 9 '(5 9 1 2)) ; => (9 1 2) 
-(member 8 '(5 9 1 2)) ; => NIL
+(member 9 (list 5 9 1 2)) ; => (9 1 2) 
+(member 8 (list 5 9 1 2)) ; => NIL
 
 ;;; -------------------
 ;;; Sequence predicates
 ;;; -------------------
 
 ;; One sequence only
-(every #'evenp '(1 2 3 4))    ; => NIL
-(some #'evenp '(1 2 3 4))     ; => T
-(notany #'evenp '(1 2 3 4))   ; => NIL
-(notevery #'evenp '(1 2 3 4)) ; => T
+(every #'evenp (list 1 2 3 4))    ; => NIL
+(some #'evenp (list 1 2 3 4))     ; => T
+(notany #'evenp (list 1 2 3 4))   ; => NIL
+(notevery #'evenp (list 1 2 3 4)) ; => T
 
 ;; Two sequences
-(every #'= '(1 2 3 4) '(5 4 3 2))    ; => NIL
-(some #'= '(1 2 3 4) '(5 4 3 2))     ; => T
-(notany #'= '(1 2 3 4) '(5 4 3 2))   ; => NIL
-(notevery #'= '(1 2 3 4) '(5 4 3 2)) ; => T
+(every #'= (list 1 2 3 4) (list 5 4 3 2))    ; => NIL
+(some #'= (list 1 2 3 4) (list 5 4 3 2))     ; => T
+(notany #'= (list 1 2 3 4) (list 5 4 3 2))   ; => NIL
+(notevery #'= (list 1 2 3 4) (list 5 4 3 2)) ; => T
 
 ;;; ------------------------------------------
 ;;; Sequence mapping functions: MAP and REDUCE
 ;;; ------------------------------------------
 
 ;; MAP function
-(map 'list #'(lambda (x) (* x x)) '(1 2 3)) ; => (1 4 9)
-(map 'vector #'* '(1 2 3) '(4 5 6))         ; => #(4 10 18)
+(map 'list #'(lambda (x) (* x x)) (list 1 2 3)) ; => (1 4 9)
+(map 'vector #'* (list 1 2 3) (list 4 5 6))     ; => #(4 10 18)
 
 ;; MAP-INTO function
-(defparameter a #(1 0 0))
-(defparameter b #(0 1 0))
-(defparameter c #(0 0 1))
+(defparameter a (vector 1 0 0))
+(defparameter b (vector 0 1 0))
+(defparameter c (vector 0 0 1))
 
 (map-into a #'+ a b c) ; => #(1 1 1)
 (print a)              ; => #(1 1 1)
 
 (map-into d #'+ a b c) ; => ERROR: The variable D is unbound.
 
-(defparameter d #(4))
-(defparameter e #(1 0 0 4))
-(defparameter f #())
+(defparameter d (vector 4))
+(defparameter e (vector 1 0 0 4))
+(defparameter f (vector))
 
 (map-into a #'+ a d) ; => #(5 1 1)
 (print a)            ; => #(5 1 1)
@@ -302,20 +314,22 @@
 (print f)            ; => #()
 
 ;; REDUCE function
-(reduce #'+ #(1 2 3 4))   ; => 10
-(reduce #'min #(1 2 3 4)) ; => 1
-(reduce #'max #(1 2 3 4)) ; => 4
+(reduce #'+ (vector 1 2 3 4))   ; => 10
+(reduce #'min (vector 1 2 3 4)) ; => 1
+(reduce #'max (vector 1 2 3 4)) ; => 4
 
 (defun average (list)
   (/ (reduce #'+ list)
      (length list)))
 
-(average #(1 2 3 4))      ; => 5/2
+(average (vector 1 2 3 4))      ; => 5/2
 
-(reduce (lambda (x y) (+ (* x 10) y)) '(1 2 3 4)) ; => 1234
+(reduce (lambda (x y) (+ (* x 10) y)) (list 1 2 3 4)) ; => 1234
 
-(reduce #'append '((1) (2)) :initial-value '(i n i t)) ; =>  (I N I T 1 2)
-(reduce #'list '(1 2 3 4) :initial-value 'foo)         ; => ((((FOO 1) 2) 3) 4)
+(reduce #'append (list (list 1) (list 2))
+        :initial-value (list 'i 'n 'i 't)) ; =>  (I N I T 1 2)
+(reduce #'list (list 1 2 3 4)
+        :initial-value 'foo)               ; => ((((FOO 1) 2) 3) 4)
 
 
 ;;;; ----------- ;;;;

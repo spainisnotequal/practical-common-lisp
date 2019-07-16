@@ -11,5 +11,5 @@
 (type-of 'foo)     ; => SYMBOL
 (type-of "foo")    ; => (SIMPLE-ARRAY CHARACTER (3))
 
-(type-of '(1 2 3)) ; => CONS
-(type-of #(1 2 3)) ; => (SIMPLE-VECTOR 3)
+(type-of (list 1 2 3)) ; => CONS
+(type-of (vector 1 2 3)) ; => (SIMPLE-VECTOR 3)
