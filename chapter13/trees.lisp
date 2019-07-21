@@ -43,3 +43,44 @@
 (map-tree #'square *t3*) ; => ((1) (4) (9))
 (map-tree #'square *t5*) ; => (((1) (4)) ((9) (16)))
 (map-tree #'square *t6*) ; => (((1) (4)) ((1) (4) (9)))
+
+;;; ------------------------------
+;;; Substitute family of fucntions
+;;; ------------------------------
+
+(defparameter *t* (list (list 1 2) (list 3 4) (list 5 6)))
+
+(subst-if nil
+          #'(lambda (x)
+              (print x)
+              (when (integerp x)
+                (oddp x)))
+          *t*)
+                                 ; => ((1 2) (3 4) (5 6)) 
+                                 ; => (1 2) 
+                                 ; => 1 
+                                 ; => (2) 
+                                 ; => 2 
+                                 ; => NIL 
+                                 ; => ((3 4) (5 6)) 
+                                 ; => (3 4) 
+                                 ; => 3 
+                                 ; => (4) 
+                                 ; => 4 
+                                 ; => NIL 
+                                 ; => ((5 6)) 
+                                 ; => (5 6) 
+                                 ; => 5 
+                                 ; => (6) 
+                                 ; => 6 
+                                 ; => NIL 
+                                 ; => NIL 
+                                 ; => ((NIL 2) (NIL 4) (NIL 6))
+
+(subst-if 'wtf
+          #'(lambda (x)
+              (print x)
+              (listp x))
+          *t*)
+                                 ; => ((1 2) (3 4) (5 6))
+                                 ; => WTF
