@@ -75,6 +75,44 @@
 ;;; Sets
 ;;; ----
 
+;; A set it's just a list, so we can creat an empty set with:
+(defparameter *set* '()) ; => NIL
+
+;; ADJOIN does not modify the original set
+(adjoin 1 *set*) ; => (1)
+*set*            ; => NIL
+
+;; If we want to modify the original set, we should use SETF
+(setf *set* (adjoin 1 *set*)) ; => (1)
+*set*                         ; => (1)
+(setf *set* (adjoin 2 *set*)) ; => (2 1)
+*set*                         ; => (2 1)
+
+;; Or use the macro PUSHNEW, that abstracts the SETF/ADJOIN combination
+(pushnew 3 *set*) ; => (3 2 1)
+*set*             ; => (3 2 1)
+
+;; If the item is found, ADJOIN just returns the original set
+(setf *set* (adjoin 1 *set*)) ; => (3 2 1)
+*set*                         ; => (3 2 1)
+
+;; To find if an item is in a set, we use MEMBER, MEMBER-IF, or MEMBER-IF-NOT
+(member 1 *set*) ; => (1
+(member 4 *set*) ; => NIL
+
+(member-if #'(lambda (x) (< x 3)) *set*) ; => (2 1)
+(member-if #'(lambda (x) (< x 9)) *set*) ; => (3 2 1)
+(member-if #'(lambda (x) (< x 0)) *set*) ; => NIL
+
+;; Some set operations (the items of the resulting set might be in any order)
+(defparameter *s1* (list 1 2 3 4))
+(defparameter *s2* (list 1 3))
+
+(intersection *s1* *s2*) ; => (3 1)
+(union *s1* *s2*) ; => (4 2 1 3)
+
+(subsetp *s2* *s1*) ; => T
+(subsetp *s1* *s2*) ; => NIL
 
 ;;; -------------
 ;;; Lookup tables
