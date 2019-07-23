@@ -118,6 +118,42 @@
 ;;; Lookup tables
 ;;; -------------
 
+;; alists (association lists)
+;; --------------------------
+
+;; define an alist, and add a new key/value pair
+(defparameter *alist* (list (cons 'a 1) (cons 'b 2)))
+*alist* ; => ((A . 1) (B . 2))
+(setf *alist* (acons 'c 3 *alist*)) ; => ((C . 3) (A . 1) (B . 2))
+*alist* ; => ((C . 3) (A . 1) (B . 2))
+
+;; define an alist with two lists: a keys list and a values list
+(defparameter *alist-1* (pairlis (list 'a 'b 'c) (list 1 2 3)))
+*alist-1* ; => ((C . 3) (A . 1) (B . 2))
+
+;; get a key/value pair, or just the value
+(assoc 'a *alist*) ; => (A . 1)
+(assoc 'c *alist*) ; => (C . 3)
+(assoc 'd *alist*) ; => NIL
+
+(assoc-if #'(lambda (symbol) (equal symbol 'a)) *alist*) ; => (A . 1)
+
+(cdr (assoc 'a *alist*)) ; => 1
+
+;; we can provide a test function (for example, if we want to use strings as keys)
+(defparameter *alist-2* (list (cons "one" 1) (cons "two" 2) (cons "three" 3)))
+*alist-2* : => (("one" . 1) ("two" . 2) ("three" . 3))
+(assoc "one" *alist-2*) ; => NIL
+(assoc "one" *alist-2* :test #'string=) ; => ("one" . 1)
+
+;; copy an alist
+(defparameter *alist-3* (copy-alist *alist*))
+(setf *alist* (acons 'd 4 *alist*)) ; => ((D . 4) (C . 3) (A . 1) (B . 2))
+*alist-3* : => ((C . 3) (A . 1) (B . 2))
+
+;; plists (property lists)
+;; -----------------------
+
 
 ;;; ------------------------
 ;;; Destructuring-bind macro
