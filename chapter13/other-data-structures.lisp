@@ -67,10 +67,8 @@
 ;; In the next example, firstly we evaluate (LISTP *t1*), which happens to be T,
 ;; so we substitute the whole tree by 'YEAH, and, because 'YEAH it's not a cons
 ;; cell, SUBST-IF ends.
-(subst-if 'yeah
-          #'(lambda (element)
-              (listp element))
-          *t1*)                        ; => YEAH
+(subst-if 'yeah #'listp *t1*); => YEAH
+
 ;;; ----
 ;;; Sets
 ;;; ----
