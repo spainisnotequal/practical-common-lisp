@@ -97,6 +97,7 @@
 ;; To find if an item is in a set, we use MEMBER, MEMBER-IF, or MEMBER-IF-NOT
 (member 1 *set*) ; => (1)
 (member 4 *set*) ; => NIL
+
 (defparameter *set-1* '())
 (setf *set-1* (adjoin 1 *set-1*)) ; => (1)
 (setf *set-1* (adjoin 2 *set-1*)) ; => (2 1)
