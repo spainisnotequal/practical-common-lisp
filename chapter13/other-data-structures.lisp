@@ -222,4 +222,29 @@
 ;;; ------------------------
 ;;; Destructuring-bind macro
 ;;; ------------------------
-    
+
+;; Destructuring a simple list:
+(destructuring-bind (x y z) (list 1 2 3)
+  (list :x x :y y :z z)) ; => (:X 1 :Y 2 :Z 3)
+
+;; Destructuring a list that contains another list:
+(destructuring-bind (x y z) (list 1 (list 2 20) 3)
+  (list :x x :y y :z z)) ; => (:X 1 :Y (2 20) :Z 3)
+(destructuring-bind (x (y1 y2) z) (list 1 (list 2 20) 3)
+  (list :x x :y1 y1 :y2 y2 :z z)) ; => (:X 1 :Y1 2 :Y2 20 :Z 3)
+
+;; Using the &optional parameter:
+(destructuring-bind (x (y1 &optional y2) z) (list 1 (list 2 20) 3)
+  (list :x x :y1 y1 :y2 y2 :z z)) ; => (:X 1 :Y1 2 :Y2 20 :Z 3)
+(destructuring-bind (x (y1 &optional y2) z) (list 1 (list 2) 3)
+  (list :x x :y1 y1 :y2 y2 :z z)) ; => (:X 1 :Y1 2 :Y2 NIL :Z 3)
+
+;; Using the &key parameter:
+(destructuring-bind (&key x y z) (list :x 1 :y 2 :z 3)
+  (list :x x :y y :z z)) ; => (:X 1 :Y 2 :Z 3)
+(destructuring-bind (&key x y z) (list :z 1 :y 2 :x 3)
+  (list :x x :y y :z z)) ; => (:X 3 :Y 2 :Z 1)
+
+;; Using the &whole parameter:
+(destructuring-bind (&whole whole &key x y z) (list :z 1 :y 2 :x 3)
+  (list :x x :y y :z z :whole whole)) ; => (:X 3 :Y 2 :Z 1 :WHOLE (:Z 1 :Y 2 :X 3))
