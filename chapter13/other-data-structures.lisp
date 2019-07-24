@@ -123,9 +123,9 @@
 
 ;; define an alist, and add a new key/value pair
 (defparameter *alist* (list (cons 'a 1) (cons 'b 2)))
-*alist* ; => ((A . 1) (B . 2))
+*alist*                             ; => ((A . 1) (B . 2))
 (setf *alist* (acons 'c 3 *alist*)) ; => ((C . 3) (A . 1) (B . 2))
-*alist* ; => ((C . 3) (A . 1) (B . 2))
+*alist*                             ; => ((C . 3) (A . 1) (B . 2))
 
 ;; define an alist with two lists: a keys list and a values list
 (defparameter *alist-1* (pairlis (list 'a 'b 'c) (list 1 2 3)))
@@ -143,17 +143,81 @@
 ;; we can provide a test function (for example, if we want to use strings as keys)
 (defparameter *alist-2* (list (cons "one" 1) (cons "two" 2) (cons "three" 3)))
 *alist-2* : => (("one" . 1) ("two" . 2) ("three" . 3))
-(assoc "one" *alist-2*) ; => NIL
+(assoc "one" *alist-2*)                 ; => NIL
 (assoc "one" *alist-2* :test #'string=) ; => ("one" . 1)
 
 ;; copy an alist
 (defparameter *alist-3* (copy-alist *alist*))
 (setf *alist* (acons 'd 4 *alist*)) ; => ((D . 4) (C . 3) (A . 1) (B . 2))
-*alist-3* : => ((C . 3) (A . 1) (B . 2))
+*alist-3*                           ; => ((C . 3) (A . 1) (B . 2))
 
 ;; plists (property lists)
 ;; -----------------------
 
+;; define an plist
+(defparameter *plist* (list 'a 1 'b 2))
+*plist* ; => (A 1 B 2)
+
+;; get the value associated to a key
+(getf *plist* 'a) ; => 1
+(getf *plist* 'c) ; => NIL
+
+;; never use numbers or strings as keys in a plist, because GETF always uses EQ
+;; to test whether the provided key matches the keys in the plist
+(defparameter *plist-1* (list "a" 1 "b" 2))
+(getf *plist-1* "a") ; => NIL
+(defparameter *plist-2* (list 1 "a" 2 "b"))
+(getf *plist-2* 1) ; => "a" ; in this case, we get the right value, but this
+                            ; behaviour depends on the implementation (in SBCL
+                            ; it works, but maybe in other implementation it
+                            ; won't)
+
+;; add a new key/value pair to a plist
+(setf (getf *plist* 'c) 3) ; => 3
+*plist*                    ; => (C 3 A 1 B 2)
+
+;; modify a value in a plist
+(setf (getf *plist* 'c) 0) ; => 0
+*plist*                    ; => (C 0 A 1 B 2)
+
+;; remove a key/value pair from a plist
+(remf *plist* 'a) ; => T
+*plist*           ; => (C 0 B 2)
+
+;; get the properties of a plist
+(defparameter *plist-3* (list 'name "Jesus" 'surname "Christ" 'age 33))
+(defun print-properties (plist keys)
+  (loop while plist do
+       (multiple-value-bind (key value tail) (get-properties plist keys)
+         (when key (format t "key: ~a; value: ~a~%" key value))
+         (setf plist (cddr tail)))))
+(print-properties *plist-3* (list 'name 'surname 'age))
+                                        ; => key: NAME; value: Jesus
+                                        ;    key: SURNAME; value: Christ
+                                        ;    key: AGE; value: 33
+                                        ;    NIL
+
+(print-properties *plist-3* (list 'name 'age))
+                                        ; => key: NAME; value: Jesus
+                                        ;    key: AGE; value: 33
+                                        ;    NIL
+
+;; every symbol has an associate plist that can be used to store information
+;; about the symbol. This is useful in some situations (like when doing any kind
+;; of symbolic programming).
+
+(defparameter *symbol* 'Frank)      ; => *SYMBOL*
+(symbol-plist *symbol*)             ; => NIL
+
+(setf (get *symbol* 'job) "hacker") ; => "hacker"
+(setf (get *symbol* 'fav-numbers)
+      '(1 3 5 7 9))                 ; => (1 3 5 7 9)
+(symbol-plist *symbol*)             ; => (FAV-NUMBERS (1 3 5 7 9) JOB "hacker")
+
+(remprop *symbol* 'fav-numbers)     ; => (FAV-NUMBERS (1 3 5 7 9) JOB "hacker")
+(symbol-plist *symbol*)             ; => (JOB "hacker")
+(remprop *symbol* 'job)             ; => (JOB "hacker")
+(symbol-plist *symbol*)             ; => NIL
 
 ;;; ------------------------
 ;;; Destructuring-bind macro
