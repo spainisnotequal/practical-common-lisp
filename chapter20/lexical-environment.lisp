@@ -1,3 +1,13 @@
+;;; --------------------------------------------------------------------
+;;; Example of a recursive function defined in the local scope of LABELS
+;;; --------------------------------------------------------------------
+
+(labels ((factorial (n &optional (result 1))
+           (if (<= n 1)
+               result
+               (factorial (1- n) (* result n)))))
+  (print (factorial 5)))
+
 ;;; -------------------------------------------------------------------
 ;;; Recursive helper function WALK, in the local scope of COLLECT-TREES
 ;;; -------------------------------------------------------------------
