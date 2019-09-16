@@ -43,3 +43,27 @@
           (reduce #'+ (remove-if-not #'oddp alist))))
 
 (sum-even-and-odd2 *dataset*) ; => 24, 15
+
+;;; -------------------------------------------------------------------------
+;;; Example of use of LOOP to go through a property list, and its alternative
+;;; -------------------------------------------------------------------------
+(defparameter *plist* '(1 uno 2 dos 3 tres))
+
+(defun print-plist (plist)
+  (loop for (key value) on plist by #'cddr
+     do (format t "~a: ~a~%" key value)))
+
+(print-plist *plist*) ; => 1: UNO
+                      ; => 2: DOS
+                      ; => 3: TRES
+                      ; => NIL
+
+(defun print-plist2 (plist)
+  (unless (null plist)
+    (format t "~a: ~a~%" (car plist) (cadr plist))
+    (print-plist2 (cddr plist))))
+
+(print-plist2 *plist*) ; => 1: UNO
+                      ; => 2: DOS
+                      ; => 3: TRES
+                      ; => NIL
