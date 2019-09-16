@@ -47,16 +47,17 @@
 ;;; -------------------------------------------------------------------------
 ;;; Example of use of LOOP to go through a property list, and its alternative
 ;;; -------------------------------------------------------------------------
+
 (defparameter *plist* '(1 uno 2 dos 3 tres))
 
 (defun print-plist (plist)
   (loop for (key value) on plist by #'cddr
      do (format t "~a: ~a~%" key value)))
 
-(print-plist *plist*) ; => 1: UNO
-                      ; => 2: DOS
-                      ; => 3: TRES
-                      ; => NIL
+(print-plist *plist*)  ; => 1: UNO
+                       ; => 2: DOS
+                       ; => 3: TRES
+                       ; => NIL
 
 (defun print-plist2 (plist)
   (unless (null plist)
@@ -64,6 +65,34 @@
     (print-plist2 (cddr plist))))
 
 (print-plist2 *plist*) ; => 1: UNO
-                      ; => 2: DOS
-                      ; => 3: TRES
-                      ; => NIL
+                       ; => 2: DOS
+                       ; => 3: TRES
+                       ; => NIL
+
+;;; ----------------------------------------------------------------------
+;;; Example of use of LOOP to go through a hash-table, and its alternative
+;;; ----------------------------------------------------------------------
+
+(defparameter *hash-table* (make-hash-table :test #'equal))
+(setf (gethash "uno" *hash-table*) "one")
+(setf (gethash "dos" *hash-table*) "two")
+(setf (gethash "tres" *hash-table*) "three")
+
+(defun print-hash-table (hash-table)
+  (loop for key being the hash-key in hash-table using (hash-value value)
+     do (format t "~a: ~a~%" key value)))
+
+(print-hash-table *hash-table*)  ; => uno: one
+                                 ; => dos: two
+                                 ; => tres: three
+                                 ; => NIL
+
+(defun print-hash-table2 (hash-table)
+  (maphash #'(lambda (key value)
+               (format t "~a: ~a~%" key value))
+           hash-table))
+
+(print-hash-table2 *hash-table*) ; => uno: one
+                                 ; => dos: two
+                                 ; => tres: three
+                                 ; => NIL
