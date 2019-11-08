@@ -12,3 +12,7 @@
    :walk-directory
    :directory-p
    :file-p))
+
+(defpackage :spam
+  (:use :common-lisp
+        :com.gigamonkeys.pathnames))
