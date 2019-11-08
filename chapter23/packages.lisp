@@ -15,4 +15,5 @@
 
 (defpackage :spam
   (:use :common-lisp
-        :com.gigamonkeys.pathnames))
+        :com.gigamonkeys.pathnames
+        :cl-ppcre))
