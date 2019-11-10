@@ -128,7 +128,7 @@
 (defun fisher (probs number-of-probs)
   "The Fisher computation described by Robinson."
   (inverse-chi-square 
-   (* -2 (log (reduce #'+ probs :key #'log)))
+   (* -2 (reduce #'+ probs :key #'log))
    (* 2 number-of-probs)))
 
 ;;; ------------------
