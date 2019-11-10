@@ -15,10 +15,12 @@
 (defparameter *min-spam-score* .6)
 
 (defun classification (score)
-  (cond
-    ((<= score *max-ham-score*)  'ham)
-    ((>= score *min-spam-score*) 'spam)
-    (t 'unsure)))
+  (values
+   (cond
+     ((<= score *max-ham-score*)  'ham)
+     ((>= score *min-spam-score*) 'spam)
+     (t 'unsure))
+   score))
 
 (defclass word-feature ()
   ((word       
