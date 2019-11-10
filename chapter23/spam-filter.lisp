@@ -7,9 +7,9 @@
 (defun classify (text)
   (classification (score (extract-features text))))
 
-;;; -----------------------
-;;; CLASSIFICATION function
-;;; -----------------------
+;;; --------------------------
+;;; The Heart of a Spam Filter
+;;; --------------------------
 
 (defparameter *max-ham-score* .4)
 (defparameter *min-spam-score* .6)
@@ -19,10 +19,6 @@
     ((<= score *max-ham-score*)  'ham)
     ((>= score *min-spam-score*) 'spam)
     (t 'unsure)))
-
-;;; -------------------------
-;;; EXTRACT-FEATURES function
-;;; -------------------------
 
 (defclass word-feature ()
   ((word       
@@ -108,3 +104,42 @@
     (/ (+ (* weigth assumed-probability)
           (* data-points basic-probability))
        (+ weigth data-points))))
+
+;;; -----------------------
+;;; Combining Probabilities
+;;; -----------------------
+
+(defun score (features)
+  (let ((spam-probs ()) (ham-probs ()) (number-of-probs 0))
+    (dolist (feature features)
+      (unless (untrained-p feature)
+        (let ((spam-prob (float (bayesian-spam-probability feature) 0.0d0)))
+          (push spam-prob spam-probs)
+          (push (- 1.0d0 spam-prob) ham-probs)
+          (incf number-of-probs))))
+    (let ((h (- 1 (fisher spam-probs number-of-probs)))
+          (s (- 1 (fisher ham-probs number-of-probs))))
+      (/ (+ (- 1 h) s) 2.0d0))))
+
+(defun untrained-p (feature)
+  (with-slots (spam-count ham-count) feature
+    (and (zerop spam-count) (zerop ham-count))))
+
+(defun fisher (probs number-of-probs)
+  "The Fisher computation described by Robinson."
+  (inverse-chi-square 
+   (* -2 (log (reduce #'+ probs :key #'log)))
+   (* 2 number-of-probs)))
+
+;;; ------------------
+;;; Inverse Chi Square
+;;; ------------------
+
+(defun inverse-chi-square (value degrees-of-freedom)
+  (assert (evenp degrees-of-freedom))
+  (min 
+   (loop with m = (/ value 2)
+      for i below (/ degrees-of-freedom 2)
+      for prob = (exp (- m)) then (* prob (/ m i))
+      summing prob)
+   1.0))
