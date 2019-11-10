@@ -89,3 +89,22 @@
   (setf *feature-database* (make-hash-table :test #'equal)
         *total-spams* 0
         *total-hams*  0))
+
+;;; -------------------
+;;; Per-Word Statistics
+;;; -------------------
+
+(defun spam-probability (feature)
+  (with-slots (spam-count ham-count) feature
+    (let ((spam-frequency (/ spam-count (max 1 *total-spams*)))
+          (ham-frequency  (/ ham-count  (max 1 *total-hams*))))
+      (/ spam-frequency (+ spam-frequency ham-frequency)))))
+
+(defun bayesian-spam-probability (feature &optional
+                                            (assumed-probability 1/2)
+                                            (weigth 1))
+  (let ((basic-probability (spam-probability feature))
+        (data-points (+ (spam-count feature) (ham-count feature))))
+    (/ (+ (* weigth assumed-probability)
+          (* data-points basic-probability))
+       (+ weigth data-points))))
