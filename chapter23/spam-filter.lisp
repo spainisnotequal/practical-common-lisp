@@ -62,3 +62,30 @@
   (print-unreadable-object (object stream :type t)
     (with-slots (word ham-count spam-count) object
       (format stream "~s :hams ~d :spams ~d" word ham-count spam-count))))
+
+;;; -------------------
+;;; Training the Filter
+;;; -------------------
+
+(defun train (text type)
+  (dolist (feature (extract-features text))
+    (increment-count feature type))
+  (increment-total-count type))
+
+(defun increment-count (feature type)
+  (ecase type
+    (ham  (incf (ham-count  feature)))
+    (spam (incf (spam-count feature)))))
+
+(defvar *total-spams* 0)
+(defvar *total-hams*  0)
+
+(defun increment-total-count (type)
+  (ecase type
+    (ham  (incf *total-hams*))
+    (spam (incf *total-spams*))))
+
+(defun clear-database ()
+  (setf *feature-database* (make-hash-table :test #'equal)
+        *total-spams* 0
+        *total-hams*  0))
