@@ -3,7 +3,6 @@
 (defun read-u2 (in)
   (+ (* (read-byte in) 256) (read-byte in)))
 
-
 (ldb (byte 8 0) #xabcd)
 (ldb (byte 8 8) #xabcd)
 
@@ -120,3 +119,37 @@
 ;;            (SIZE          :INITARG :SIZE          :ACCESSOR SIZE)
 ;;            (FRAMES        :INITARG :FRAMES        :ACCESSOR FRAMES)))
 
+
+;;; Reading binary objects
+
+;; READ-VALUE generic function
+(defgeneric read-value (type stream &key)
+  (:documentation "Read a value of the given type from the stream."))
+
+;; Generate the appopriate SETF form from a slot specifier
+(defun slot->read-value (spec stream)
+  (destructuring-bind (name (type &rest args)) (normalize-slot-spec spec)
+    `(setf ,name (read-value ',type ,stream ,@args))))
+
+(defun normalize-slot-spec (spec)
+  (list (first spec) (mklist (second spec))))
+
+(defun mklist (x) (if (listp x) x (list x)))
+
+(slot->read-value '(major-version u1) 'stream)
+;=> (SETF MAJOR-VERSION (READ-VALUE 'U1 STREAM))
+(slot->read-value '(identifier (iso-8859-1-string :length 3)) 'stream)
+;=> (SETF IDENTIFIER (READ-VALUE 'ISO-8859-1-STRING STREAM :LENGTH 3))
+
+;; Second version of DEFINE-BINARY-CLASS
+(defmacro define-binary-class (name slots)
+  (with-gensyms (typevar objectvar streamvar)
+    `(progn
+       (defclass ,name ()
+         ,(mapcar #'slot->defclass-slot slots))
+
+       (defmethod read-value ((,typevar (eql ',name)) ,streamvar &key)
+         (let ((,objectvar (make-instance ',name)))
+           (with-slots ,(mapcar #'first slots) ,objectvar
+             ,@(mapcar #'(lambda (x) (slot->read-value x streamvar)) slots))
+           ,objectvar)))))
