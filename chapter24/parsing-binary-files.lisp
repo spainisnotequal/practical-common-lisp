@@ -58,7 +58,8 @@
 
 ;;; Designing the macros
 
-(define-binary-class id3-tag
+(define-binary-class
+    id3-tag
     ((file-identifier (iso-8859-1-string :length 3))
      (major-version   u1)
      (revision        u1)
