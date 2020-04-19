@@ -141,7 +141,7 @@
 (slot->read-value '(identifier (iso-8859-1-string :length 3)) 'stream)
 ;=> (SETF IDENTIFIER (READ-VALUE 'ISO-8859-1-STRING STREAM :LENGTH 3))
 
-;; Second version of DEFINE-BINARY-CLASS
+;; Add the READ-VALUE method to the DEFINE-BINARY-CLASS macro
 (defmacro define-binary-class (name slots)
   (with-gensyms (typevar objectvar streamvar)
     `(progn
@@ -153,3 +153,31 @@
            (with-slots ,(mapcar #'first slots) ,objectvar
              ,@(mapcar #'(lambda (x) (slot->read-value x streamvar)) slots))
            ,objectvar)))))
+
+;;; Writing binary objects
+
+;; WRITE-VALUE generic function
+(defgeneric write-value (type stream &key)
+  (:documentation "Write a value of the given type from the stream."))
+
+;; Generate the appopriate WRITE-VALUE expression from a slot specifier
+(defun slot->write-value (spec stream)
+  (destructuring-bind (name (type &rest args)) (normalize-slot-spec spec)
+    `(write-value ',type ,stream ,name ,@args)))
+
+;;; Add the WRITE-VALUE method to the DEFINE-BINARY-CLASS macro
+(defmacro define-binary-class (name slots)
+  (with-gensyms (typevar objectvar streamvar)
+    `(progn
+       (defclass ,name ()
+         ,(mapcar #'slot->defclass-slot slots))
+
+       (defmethod read-value ((,typevar (eql ',name)) ,streamvar &key)
+         (let ((,objectvar (make-instance ',name)))
+           (with-slots ,(mapcar #'first slots) ,objectvar
+             ,@(mapcar #'(lambda (x) (slot->read-value x streamvar)) slots))
+           ,objectvar))
+
+       (defmethod write-value ((,typevar (eql ',name)) ,streamvar ,objectvar &key)
+         (with-slots ,(mapcar #'first slots) ,objectvar
+           ,@(mapcar #'(lambda (x) (slot->write-value x streamvar)) slots))))))
