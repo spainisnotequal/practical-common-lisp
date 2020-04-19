@@ -65,3 +65,18 @@
      (flags           u1)
      (size            id3-tag-size)
      (frames          (id3-frames :tag-size size))))
+
+;;; Making the dream a reality
+
+;; Bring the with-gensyms macro from Chapter 8
+(defmacro with-gensyms ((&rest names) &body body)
+  `(let ,(loop for n in names collect `(,n (gensym)))
+     ,@body))
+
+;; Bring the once-only macro from Chapter 8
+(defmacro once-only ((&rest names) &body body)
+  (let ((gensyms (loop for n in names collect (gensym))))
+    `(let (,@(loop for g in gensyms collect `(,g (gensym))))
+       `(let (,,@(loop for g in gensyms for n in names collect ``(,,g ,,n)))
+          ,(let (,@(loop for n in names for g in gensyms collect `(,n ,g)))
+             ,@body)))))
