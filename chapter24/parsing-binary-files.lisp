@@ -81,3 +81,17 @@
        `(let (,,@(loop for g in gensyms for n in names collect ``(,,g ,,n)))
           ,(let (,@(loop for n in names for g in gensyms collect `(,n ,g)))
              ,@body)))))
+
+;; translate a symbol to the corresponding keyword symbol
+(defun as-keyword (sym)
+  (intern (string sym) :keyword))
+
+(as-keyword 'book) ;=> :BOOK, NIL
+
+;; Create a DEFCLASS slot specifier
+(defun slot->defclass-slot (spec)
+  (let ((name (first spec)))
+    `(,name :initarg ,(as-keyword name) :accessor ,name)))
+
+(slot->defclass-slot '(major-version u1))
+;=> (MAJOR-VERSION :INITARG :MAJOR-VERSION :ACCESSOR MAJOR-VERSION)
