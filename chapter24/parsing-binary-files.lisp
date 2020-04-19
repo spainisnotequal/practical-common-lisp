@@ -36,6 +36,7 @@
   (write-byte (char-code +null+) out))
 
 ;;; Composite structures
+
 (defclass id3-tag    ()
   ((identifier    :initarg :identifier    :accessor    identifier)
    (major-version :initarg :major-version :accessor    major-version)
@@ -55,3 +56,12 @@
       (setf frames        (read-id3-frames in :tag-size size)))
     tag))
 
+;;; Designing the macros
+
+(define-binary-class id3-tag
+    ((file-identifier (iso-8859-1-string :length 3))
+     (major-version   u1)
+     (revision        u1)
+     (flags           u1)
+     (size            id3-tag-size)
+     (frames          (id3-frames :tag-size size))))
