@@ -95,3 +95,28 @@
 
 (slot->defclass-slot '(major-version u1))
 ;=> (MAJOR-VERSION :INITARG :MAJOR-VERSION :ACCESSOR MAJOR-VERSION)
+
+;; First version of DEFINE-BINARY-CLASS
+(defmacro define-binary-class (name slots)
+  `(defclass ,name ()
+     ,(mapcar #'slot->defclass-slot slots)))
+
+(macroexpand-1
+ '(define-binary-class
+   id3-tag
+   ((identifier    (iso-8859-1-string :length 3))
+    (major-version u1)
+    (revision      u1)
+    (flags         u1)
+    (size          id3-tag-size)
+    (frames        (id3-frames :tag-size size)))))
+
+
+;; (DEFCLASS ID3-TAG NIL
+;;           ((IDENTIFIER    :INITARG :IDENTIFIER    :ACCESSOR IDENTIFIER)
+;;            (MAJOR-VERSION :INITARG :MAJOR-VERSION :ACCESSOR MAJOR-VERSION)
+;;            (REVISION      :INITARG :REVISION      :ACCESSOR REVISION)
+;;            (FLAGS         :INITARG :FLAGS         :ACCESSOR FLAGS)
+;;            (SIZE          :INITARG :SIZE          :ACCESSOR SIZE)
+;;            (FRAMES        :INITARG :FRAMES        :ACCESSOR FRAMES)))
+
