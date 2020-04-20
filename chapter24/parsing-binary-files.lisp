@@ -244,3 +244,53 @@
 (defun new-class-all-slots (slots superclasses)
   (nconc (mapcan #'all-slots superclasses) (mapcar #'first slots)))
 
+;;; Tagged structures
+
+;; Factor out the common part of DEFINE-BINARY-CLASS AND DEFINE-TAGGED-BINARY-CLASS
+(defmacro define-generic-binary-class (name (&rest superclasses) slots read-method)
+  (with-gensyms (objectvar streamvar)
+    `(progn
+       (eval-when (:compile-toplevel :load-toplevel :execute)
+         (setf (get ',name 'slots) ',(mapcar #'first slots))
+         (setf (get ',name 'superclasses) ',superclasses))
+
+       (defclass ,name ,superclasses
+         ,(mapcar #'slot->defclass-slot slots))
+
+       ,read-method
+
+       (defmethod write-object progn ((,objectvar ,name) ,streamvar)
+                  (declare (ignorable ,streamvar))
+                  (with-slots ,(new-class-all-slots slots superclasses) ,objectvar
+                    ,@(mapcar #'(lambda (x) (slot->write-value x streamvar)) slots))))))
+
+;; Redefine the DEFINE-BINARY-CLASS macro to use the above DEFINE-GENERIC-BINARY-CLASS macro
+(defmacro define-binary-class (name (&rest superclasses) slots)
+  (with-gensyms (objectvar streamvar)
+    `(define-generic-binary-class ,name ,superclasses ,slots
+                                  (defmethod read-object progn ((,objectvar ,name) ,streamvar)
+                                             (declare (ignorable ,streamvar))
+                                             (with-slots ,(new-class-all-slots slots superclasses) ,objectvar
+                                               ,@(mapcar #'(lambda (x) (slot->read-value x streamvar)) slots))))))
+
+;; Define the DEFINE-TAGGED-BINARY-CLASS
+(defmacro define-tagged-binary-class (name (&rest superclasses) slots &rest options)
+  (with-gensyms (typevar objectvar streamvar)
+    `(define-generic-binary-class ,name ,superclasses ,slots
+                                  (defmethod read-value ((,typevar (eql ',name)) ,streamvar &key)
+                                    (let* ,(mapcar #'(lambda (x) (slot->binding x streamvar)) slots)
+                                      (let ((,objectvar
+                                             (make-instance
+                                              ,@(or (cdr (assoc :dispatch options))
+                                                    (error "Must supply :dispatch form."))
+                                              ,@(mapcan #'slot->keyword-arg slots))))
+                                        (read-object ,objectvar ,streamvar)
+                                        ,objectvar))))))
+
+(defun slot->binding (spec stream)
+  (destructuring-bind (name (type &rest args)) (normalize-slot-spec spec)
+    `(,name (read-value ',type ,stream ,@args))))
+
+(defun slot->keyword-arg (spec)
+  (let ((name (first spec)))
+    `(,(as-keyword name) ,name)))
