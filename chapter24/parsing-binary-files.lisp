@@ -181,3 +181,29 @@
        (defmethod write-value ((,typevar (eql ',name)) ,streamvar ,objectvar &key)
          (with-slots ,(mapcar #'first slots) ,objectvar
            ,@(mapcar #'(lambda (x) (slot->write-value x streamvar)) slots))))))
+
+;;; Adding inheritance and tagged structures
+
+;; Define generic functions to take an object instead of an object type
+(defgeneric read-object (object stream)
+  (:method-combination progn :most-specific-last)
+  (:documentation "Fill in the slots of object from stream."))
+
+(defgeneric write-object (object stream)
+  (:method-combination progn :most-specific-last)
+  (:documentation "Write out the slots of object to the stream."))
+
+;;; Redefine the  DEFINE-BINARY-CLASS macro to be able to support inheritance
+(defmacro define-binary-class (name superclasses slots)
+  (with-gensyms (objectvar streamvar)
+    `(progn
+       (defclass ,name ,superclasses
+         ,(mapcar #'slot->defclass-slot slots))
+
+       (defmethod read-object progn ((,objectvar ,name) ,streamvar)
+                  (with-slots ,(mapcar #'first slots) ,objectvar
+                    ,@(mapcar #'(lambda (x) (slot->read-value x streamvar)) slots)))
+
+       (defmethod write-object progn ((,objectvar ,name) ,streamvar)
+                  (with-slots ,(mapcar #'first slots) ,objectvar
+                    ,@(mapcar #'(lambda (x) (slot->write-value x streamvar)) slots))))))
