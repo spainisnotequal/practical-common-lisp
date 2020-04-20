@@ -294,3 +294,39 @@
 (defun slot->keyword-arg (spec)
   (let ((name (first spec)))
     `(,(as-keyword name) ,name)))
+
+;;; Primitive binary types
+
+;; Macro to generate READ-VALUE and WRITE-VALUE methods to read values represented by instances
+(defmacro define-binary-type (name (&rest args) &body spec)
+  (with-gensyms (type)
+    `(progn
+       ,(destructuring-bind ((in) &body body) (rest (assoc :reader spec))
+          `(defmethod read-value ((,type (eql ',name)) ,in &key ,@args)
+             ,@body))
+       
+       ,(destructuring-bind ((out value) &body body) (rest (assoc :writer spec))
+          `(defmethod write-value ((,type (eql ',name)) ,out ,value &key ,@args)
+             ,@body)))))
+
+;; Redefine the DEFINE-BINARY-TYPE macro to support two ways of calling it
+(defmacro define-binary-type (name (&rest args) &body spec)
+  (ecase (length spec)
+    (1
+     (with-gensyms (type stream value)
+       (destructuring-bind (derived-from &rest derived-args) (mklist (first spec))
+         `(progn
+            (defmethod read-value ((,type (eql ',name)) ,stream &key ,@args)
+              (read-value ',derived-from ,stream ,@derived-args))
+            (defmethod write-value ((,type (eql ',name)) ,stream ,value &key ,@args)
+              (write-value ',derived-from ,stream ,value ,@derived-args))))))
+    (2
+     (with-gensyms (type)
+       `(progn
+          ,(destructuring-bind ((in) &body body) (rest (assoc :reader spec))
+             `(defmethod read-value ((,type (eql ',name)) ,in &key ,@args)
+                ,@body))
+          ,(destructuring-bind ((out value) &body body) (rest (assoc :writer spec))
+             `(defmethod write-value ((,type (eql ',name)) ,out ,value &key ,@args)
+                ,@body)))))))
+
