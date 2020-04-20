@@ -193,7 +193,7 @@
   (:method-combination progn :most-specific-last)
   (:documentation "Write out the slots of object to the stream."))
 
-;;; Redefine the  DEFINE-BINARY-CLASS macro to be able to support inheritance
+;; Redefine the  DEFINE-BINARY-CLASS macro to be able to support inheritance
 (defmacro define-binary-class (name superclasses slots)
   (with-gensyms (objectvar streamvar)
     `(progn
@@ -207,3 +207,40 @@
        (defmethod write-object progn ((,objectvar ,name) ,streamvar)
                   (with-slots ,(mapcar #'first slots) ,objectvar
                     ,@(mapcar #'(lambda (x) (slot->write-value x streamvar)) slots))))))
+
+;;; Keeping track of inherited slots
+
+;; Redefine the  DEFINE-BINARY-CLASS macro to be able to refer to inherited slots
+(defmacro define-binary-class (name superclasses slots)
+  (with-gensyms (objectvar streamvar)
+    `(progn
+       (eval-when (:compile-toplevel :load-toplevel :execute)
+         (setf (get ',name 'slots) ',(mapcar #'first slots))
+         (setf (get ',name 'superclasses) ',superclasses))
+
+       (defclass ,name ,superclasses
+         ,(mapcar #'slot->defclass-slot slots))
+
+       (defmethod read-object progn ((,objectvar ,name) ,streamvar)
+                  (with-slots ,(mapcar #'first slots) ,objectvar
+                    ,@(mapcar #'(lambda (x) (slot->read-value x streamvar)) slots)))
+
+       (defmethod write-object progn ((,objectvar ,name) ,streamvar)
+                  (with-slots ,(mapcar #'first slots) ,objectvar
+                    ,@(mapcar #'(lambda (x) (slot->write-value x streamvar)) slots))))))
+
+;; Access to the object's slots
+(defun direct-slots (name)
+  (copy-list (get name 'slots)))
+
+(defun inherited-slots (name)
+  (loop for super in (get name 'superclasses)
+     nconc (direct-slots super)
+     nconc (inherited-slots super)))
+
+(defun all-slots (name)
+  (nconc (direct-slots name) (inherited-slots name)))
+
+(defun new-class-all-slots (slots superclasses)
+  (nconc (mapcan #'all-slots superclasses) (mapcar #'first slots)))
+
